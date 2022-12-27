@@ -137,7 +137,6 @@ You can also use it in the browser with an AMD module loading tool like [require
 - secrets.init()
 - secrets.getConfig()
 - secrets.extractShareComponents()
-- secrets.setRNG()
 - secrets.random()
 - secrets.str2hex()
 - secrets.hex2str()
@@ -172,12 +171,11 @@ Create a new share from the input shares.
 
 The output of `secrets.newShare()` is a String. This is the same format for the share that `secrets.share()` outputs. Note that this function ALWAYS produces an output String. However, as for `secrets.combine()`, if the number of `shares` that are entered is not the `threshold` number of shares, the output share _will not_ be a valid share (i.e. _will not_ be useful in reconstructing the original secret). In order to guarantee that the share is valid, the correct `threshold` number of shares must be provided.
 
-### secrets.init( [bits, rngType] )
+### secrets.init( bits )
 
 Set the number of bits to use for finite field arithmetic.
 
 - `bits`: Number, optional, default `8`: An integer between 3 and 20. The number of bits to use for the Galois field.
-- `rngType`: String, optional: A string that has one of the values `["nodeCryptoRandomBytes", "browserCryptoGetRandomValues"]`. Setting this will try to override the RNG that would be selected normally based on feature detection. Warning: You can specify a RNG that won't actually _work_ in your environment.
 
 Internally, secrets.js uses finite field arithmetic in binary Galois Fields of size 2^bits. Multiplication is implemented by the means of log and exponential tables. Before any arithmetic is performed, the log and exp tables are pre-computed. Each table contains 2^bits entries.
 
@@ -198,8 +196,6 @@ Returns an Object with the current configuration. Has the following properties:
 - `bits`: [Number] The number of bits used for the current initialized finite field
 - `radix`: [Number] The current radix (Default: 16)
 - `maxShares`: [Number] The max shares that can be created with the current `bits`. Computed as `Math.pow(2, config.bits) - 1`
-- `hasCSPRNG`: [Boolean] Indicates whether or not a Cryptographically Secure Pseudo Random Number Generator has been found and initialized.
-- - `typeCSPRNG`: [String] Indicates which random number generator function has been selected based on either environment feature detection (the default) or by manually specifying the RNG type using `secrets.init()` or `secrets.setRNG()`. The current possible types that can be displayed here are ["nodeCryptoRandomBytes", "browserCryptoGetRandomValues"].
 
 ### secrets.extractShareComponents( share )
 
@@ -208,16 +204,6 @@ Returns an Object with the extracted parts of a public share string passed as an
 - `bits`: [Number] The number of bits configured when the share was created.
 - `id`: [Number] The ID number associated with the share when created.
 - `data`: [String] A hex string of the actual share data.
-
-### secrets.setRNG( function(bits){} | rngType )
-
-Set the pseudo-random number generator used to compute shares.
-
-secrets.js uses a PRNG in the `secrets.share()` and `secrets.random()` functions. By default, it tries to use a cryptographically strong PRNG. In Node.js this is `crypto.randomBytes()`. In browsers that support it, it is `crypto.getRandomValues()` (using typed arrays, which must be supported too).
-
-To supply your own PRNG, use `secrets.setRNG()`. It expects a Function of the form `function(bits){}`. It should compute a random integer between 1 and 2^bits-1. The output must be a String of length `bits` containing random 1's and 0's (cannot be ALL 0's). When `secrets.setRNG()` is called, it tries to check the PRNG to make sure it complies with some of these demands, but obviously it's not possible to run through all possible outputs. So make sure that it works correctly.
-
-- `rngType`: String, optional: A string that has one of the values `["nodeCryptoRandomBytes", "browserCryptoGetRandomValues"]`. Setting this will try to override the RNG that would be selected normally based on feature detection. Warning: You can specify a RNG that won't actually _work_ in your environment.
 
 ### secrets.random( bits )
 
@@ -315,6 +301,13 @@ npm run test-browser-min
 ```
 
 ## Changelog
+
+- 3.0.0
+
+  - [BREAKING, SECURITY] Remove ability to specify RNG `type` in `.init()`
+  - [BREAKING, SECURITY] Remove `.setRNG()` public API. Appropriate browser and Node.js RNG auto-detected now.
+  - [BREAKING] Remove `config.typeCSPRNG` property from `.getConfig()`
+  - [BREAKING] Remove `config.hasCSPRNG` property from `.getConfig()`
 
 - 2.0.0
 

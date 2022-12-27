@@ -2,8 +2,6 @@ interface SecretsConfig {
   radix: number
   bits: number
   maxShares: number
-  hasCSPRNG: boolean
-  typeCSPRNG: string
 }
 
 interface ShareComponents {
@@ -11,11 +9,6 @@ interface ShareComponents {
   id: number
   data: string
 }
-
-type RNGType =
-  | "nodeCryptoRandomBytes"
-  | "browserCryptoGetRandomValues"
-  | "testRandom"
 
 type Shares = Array<string>
 
@@ -29,7 +22,7 @@ type RNGFunction = (bits: number) => string
 /**
  * Initialize secrets with default settings.
  */
-export function init(bits: number, rngType: string): void
+export function init(bits: number): void
 
 /**
  * Get the current config.
@@ -49,12 +42,6 @@ export function combine(shares: Shares, at?: number): string
  * and share data (Hex) and return an Object containing those components.
  */
 export function extractShareComponents(share: string): ShareComponents
-
-/**
- * Set the PRNG to use. If no RNG function is supplied, pick a default using getRNG()
- * @param rng One of the acceptable RNG types.
- */
-export function setRNG(rng?: RNGType): void
 
 /**
  * Converts a given UTF16 character string to the HEX representation.
@@ -103,18 +90,6 @@ export function _padLeft(str: string, multipleOfBits?: number): string
 
 export function _hex2bin(str: string): string
 export function _bin2hex(str: string): string
-
-/**
- * Returns a pseudo-random number generator of the form function(bits){}
- * which should output a random string of 1's and 0's of length `bits`.
- * `type` (Optional) : A string representing the CSPRNG that you want to
- * force to be loaded, overriding feature detection. Can be one of:
- *    "nodeCryptoRandomBytes"
- *    "browserCryptoGetRandomValues"
- */
-export function _getRNG(type?: RNGType): RNGFunction
-
-export function _isSetRNG(): boolean
 
 /**
  * Splits a number string `bits`-length segments, after first

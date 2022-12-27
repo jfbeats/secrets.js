@@ -7,7 +7,7 @@ describe("Secrets private function", function() {
     describe("padLeft()", function() {
         beforeEach(function() {
             secrets.init()
-            secrets.setRNG("testRandom")
+            secrets.useUnsafeDeterministicTestRNG()
         })
 
         it("without specifying bits of padding it should default to config.bits", function() {
@@ -77,10 +77,6 @@ describe("Secrets private function", function() {
     describe("hex2bin()", function() {})
 
     describe("bin2hex()", function() {})
-
-    describe("getRNG()", function() {})
-
-    describe("isSetRNG()", function() {})
 
     describe("splitNumStringToIntArray()", function() {})
 

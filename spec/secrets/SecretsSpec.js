@@ -29,7 +29,7 @@ describe("Secrets", function() {
 
         beforeEach(function() {
             secrets.init()
-            secrets.setRNG("testRandom")
+            secrets.useUnsafeDeterministicTestRNG()
             key = secrets.random(128)
         })
 
@@ -90,7 +90,7 @@ describe("Secrets", function() {
     describe("should return its own config with getConfig()", function() {
         beforeEach(function() {
             secrets.init()
-            secrets.setRNG("testRandom")
+            secrets.useUnsafeDeterministicTestRNG()
         })
 
         it("with no args to init", function() {
@@ -98,9 +98,7 @@ describe("Secrets", function() {
             expectedConfig = {
                 radix: 16,
                 bits: 8,
-                maxShares: 255,
-                hasCSPRNG: true,
-                typeCSPRNG: "testRandom"
+                maxShares: 255
             }
             expect(secrets.getConfig()).toEqual(expectedConfig)
         })
@@ -110,129 +108,11 @@ describe("Secrets", function() {
             expectedConfig = {
                 radix: 16,
                 bits: 16,
-                maxShares: 65535,
-                hasCSPRNG: true,
-                typeCSPRNG: "testRandom"
+                maxShares: 65535
             }
-            secrets.init(16, "testRandom")
+            secrets.init(16)
+            secrets.useUnsafeDeterministicTestRNG()
             expect(secrets.getConfig()).toEqual(expectedConfig)
-        })
-    })
-
-    describe("should be able to be created specifying Random Number Generator with setRNG()", function() {
-        beforeEach(function() {
-            secrets.init()
-            secrets.setRNG("testRandom")
-        })
-
-        it("when its a string that is a valid RNG type", function() {
-            // modify the test for node vs. browser env.
-            if (
-                typeof crypto === "object" &&
-                typeof crypto.randomBytes === "function"
-            ) {
-                secrets.setRNG("nodeCryptoRandomBytes")
-                expect(secrets.getConfig().typeCSPRNG).toEqual(
-                    "nodeCryptoRandomBytes"
-                )
-            } else {
-                secrets.setRNG("browserCryptoGetRandomValues")
-                expect(secrets.getConfig().typeCSPRNG).toEqual(
-                    "browserCryptoGetRandomValues"
-                )
-            }
-        })
-
-        it("when its a function accepts a 'bits' arg and returns a bits length string of binary digits", function() {
-            var getFixedBitString = function(bits) {
-                var arr = new Uint32Array(1)
-                arr[0] = 123456789
-                // convert the 'random' num to binary and take only 'bits' characters.
-                return arr[0].toString(2).substr(0, bits)
-            }
-
-            secrets.setRNG(function(bits) {
-                return getFixedBitString(bits)
-            })
-
-            // Expect the same random value every time since the fixed RNG always
-            // returns the same string for a given bitlength.
-            expect(secrets.random(128)).toEqual("75bcd15")
-        })
-
-        it("when that function accepts a 'bits' arg and returns a bits length string of binary digits", function() {
-            var getFixedBitString = function(bits) {
-                var arr = new Uint32Array(1)
-                arr[0] = 123456789
-                // convert the 'random' num to binary and take only 'bits' characters.
-                return arr[0].toString(2).substr(0, bits)
-            }
-
-            secrets.setRNG(function(bits) {
-                return getFixedBitString(bits)
-            })
-
-            // Expect the same random value every time since the fixed RNG always
-            // returns the same string for a given bitlength.
-            expect(secrets.random(128)).toEqual("75bcd15")
-        })
-
-        it("unless the arg is a string that is not a valid RNG type", function() {
-            expect(function() {
-                secrets.setRNG("FOO")
-            }).toThrowError("Invalid RNG type argument : 'FOO'")
-        })
-
-        it("unless that function does not return a string as output", function() {
-            var getFixedBitString = function(bits) {
-                return ["not", "a", "string", bits]
-            }
-            expect(function() {
-                secrets.setRNG(function(bits) {
-                    return getFixedBitString(bits)
-                })
-            }).toThrowError(
-                "Random number generator is invalid (Output is not a string). Supply an CSPRNG of the form function(bits){} that returns a string containing 'bits' number of random 1's and 0's."
-            )
-        })
-
-        it("unless that function does not return a string of parseable binary digits as output", function() {
-            var getFixedBitString = function(bits) {
-                return "abcdef"
-            }
-            expect(function() {
-                secrets.setRNG(function(bits) {
-                    return getFixedBitString(bits)
-                })
-            }).toThrowError(
-                "Random number generator is invalid (Binary string output not parseable to an Integer). Supply an CSPRNG of the form function(bits){} that returns a string containing 'bits' number of random 1's and 0's."
-            )
-        })
-
-        it("unless that function returns a string longer than config bits", function() {
-            var getFixedBitString = function(bits) {
-                return "001010101" // 9 when expecting 8
-            }
-            expect(function() {
-                secrets.setRNG(function(bits) {
-                    return getFixedBitString(bits)
-                })
-            }).toThrowError(
-                "Random number generator is invalid (Output length is greater than config.bits). Supply an CSPRNG of the form function(bits){} that returns a string containing 'bits' number of random 1's and 0's."
-            )
-        })
-
-        it("unless that function returns a string shorter than config bits", function() {
-            var getFixedBitString = function(bits) {
-                return "0010101" // 7 when expecting 8
-            }
-            expect(function() {
-                secrets.setRNG(function(bits) {
-                    return getFixedBitString(bits)
-                })
-            }).toThrowError(
-                "Random number generator is invalid (Output length is less than config.bits). Supply an CSPRNG of the form function(bits){} that returns a string containing 'bits' number of random 1's and 0's."
-            )
         })
     })
 
@@ -241,7 +121,7 @@ describe("Secrets", function() {
 
         beforeEach(function() {
             secrets.init()
-            secrets.setRNG("testRandom")
+            secrets.useUnsafeDeterministicTestRNG()
             key = secrets.random(128)
         })
 
@@ -400,7 +280,7 @@ describe("Secrets", function() {
 
         beforeEach(function() {
             secrets.init()
-            secrets.setRNG("testRandom")
+            secrets.useUnsafeDeterministicTestRNG()
             key = secrets.random(128)
             numShares = 10
             threshold = 5
@@ -488,7 +368,7 @@ describe("Secrets", function() {
 
         beforeEach(function() {
             secrets.init()
-            secrets.setRNG("testRandom")
+            secrets.useUnsafeDeterministicTestRNG()
             key = secrets.random(128)
         })
 
@@ -544,7 +424,7 @@ describe("Secrets", function() {
     describe("should be able to round trip convert a string to/from Hex for sharing", function() {
         beforeEach(function() {
             secrets.init()
-            secrets.setRNG("testRandom")
+            secrets.useUnsafeDeterministicTestRNG()
         })
 
         it("if the string is plain ASCII text", function() {
@@ -633,7 +513,7 @@ describe("Secrets", function() {
     describe("should be able to generate a random Hex string", function() {
         beforeEach(function() {
             secrets.init()
-            secrets.setRNG("testRandom")
+            secrets.useUnsafeDeterministicTestRNG()
         })
 
         it("with valid Hex chars 0-9 and a-f", function() {
@@ -676,7 +556,7 @@ describe("Secrets", function() {
     describe("should be able to do conversions", function() {
         beforeEach(function() {
             secrets.init()
-            secrets.setRNG("testRandom")
+            secrets.useUnsafeDeterministicTestRNG()
         })
 
         it("from a known binary string to a known hex output", function() {
@@ -732,7 +612,7 @@ describe("Secrets", function() {
     describe("share data should be able to be extracted", function() {
         beforeEach(function() {
             secrets.init()
-            secrets.setRNG("testRandom")
+            secrets.useUnsafeDeterministicTestRNG()
         })
 
         it("when 8 bit shares are created", function() {
