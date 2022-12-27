@@ -308,6 +308,8 @@ npm run test-browser-min
   - [BREAKING, SECURITY] Remove `.setRNG()` public API. Appropriate browser and Node.js RNG auto-detected now.
   - [BREAKING] Remove `config.typeCSPRNG` property from `.getConfig()`
   - [BREAKING] Remove `config.hasCSPRNG` property from `.getConfig()`
+  - [BREAKING] Convert to ESM
+  - [BREAKING] Force browser init
 
 - 2.0.0
 
