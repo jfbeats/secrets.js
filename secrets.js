@@ -8,34 +8,10 @@
 // eslint : http://eslint.org/docs/configuring/
 /*eslint-env node, browser, jasmine */
 /*eslint no-underscore-dangle:0 */
+const secrets = init(window.crypto)
+export default secrets
 
-// UMD (Universal Module Definition)
-// Uses Node, AMD or browser globals to create a module. This module creates
-// a global even when AMD is used. This is useful if you have some scripts
-// that are loaded by an AMD loader, but they still want access to globals.
-// See : https://github.com/umdjs/umd
-// See : https://github.com/umdjs/umd/blob/master/returnExportsGlobal.js
-//
-;(function(root, factory) {
-    "use strict"
-
-    if (typeof define === "function" && define.amd) {
-        // AMD. Register as an anonymous module.
-        define([], function() {
-            /*eslint-disable no-return-assign */
-            return (root.secrets = factory())
-            /*eslint-enable no-return-assign */
-        })
-    } else if (typeof exports === "object") {
-        // Node. Does not work with strict CommonJS, but
-        // only CommonJS-like environments that support module.exports,
-        // like Node.
-        module.exports = factory(require("crypto"))
-    } else {
-        // Browser globals (root is window)
-        root.secrets = factory(root.crypto)
-    }
-})(this, function(crypto) {
+function init (crypto) {
     "use strict"
 
     var defaults, config, preGenPadding
@@ -936,4 +912,4 @@
     secrets.init()
 
     return secrets
-})
+}
