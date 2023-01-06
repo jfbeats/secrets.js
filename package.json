@@ -1,5 +1,5 @@
 {
-    "name": "secrets.js-grempe",
+    "name": "secrets.js-jf",
     "version": "2.0.0",
     "description": "Shamir's threshold secret sharing scheme for JavaScript.",
     "main": "secrets.js",
@@ -27,7 +27,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/grempe/secrets.js.git"
+        "url": "https://github.com/jfbeats/secrets.js.git"
     },
     "keywords": [
         "secret",
@@ -44,6 +44,6 @@
     "bugs": {
         "url": "https://github.com/grempe/secrets.js/issues"
     },
-    "homepage": "https://github.com/grempe/secrets.js",
+    "homepage": "https://github.com/jfbeats/secrets.js",
     "typings": "./secrets.js.d.ts"
 }
